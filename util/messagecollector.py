@@ -12,7 +12,7 @@ class MessageReader:
 class MessageCollector:
     @staticmethod
     def collect(paths, log_paths=False, log_files=False):
-        from classmap import ClassMap
+        from util.classmap import ClassMap
         result = []
         classes = ClassMap()
         for path in paths:

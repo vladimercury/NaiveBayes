@@ -1,4 +1,4 @@
-class NaiveBayes:
+class NaiveBayesClassifier:
     def __init__(self):
         from collections import defaultdict
         self.classes = defaultdict(lambda: 0)
