@@ -1,29 +1,24 @@
 class NaiveBayesClassifier:
     def __init__(self):
         from collections import defaultdict
-        self.classes = defaultdict(lambda: 0)
-        self.freq = defaultdict(lambda: 0)
-        self.trained = False
+        self.frequency_table = defaultdict(lambda: 0)
+        self.messages_in_class = defaultdict(lambda: 0)
+        self.messages_total = 0
+        self.words_in_class = defaultdict(lambda: 0)
+        self.words = defaultdict(lambda: 0)
 
     def train(self, samples):
         for features, label in samples:
-            self.classes[label] += 1
-            try:
-                for feature in features:
-                    self.freq[label, feature] += 1
-            except TypeError:
-                self.freq[label, features] += 1
-        for label, feature in self.freq:
-            self.freq[label, feature] /= self.classes[label]
-        for c in self.classes:
-            self.classes[c] /= len(samples)
-        self.trained = True
-        return self.classes, self.freq
+            self.messages_in_class[label] += 1
+            self.messages_total += 1
+            for feature in features:
+                self.frequency_table[label, feature] += 1
+                self.words_in_class[label] += 1
+                self.words[feature] += 1
 
     def classify(self, features):
         from math import log
-        if not self.trained:
-            raise RuntimeError('Classifier is not trained')
-        return min(self.classes.keys(),
-                   key=lambda x: -log(self.classes[x])
-                   + sum(-log(self.freq.get((x, feature), 10**(-7))) for feature in features))
+        return max(self.messages_in_class.keys(),
+                   key=lambda x: log(self.messages_in_class[x] / self.messages_total)
+                        + sum([log((self.frequency_table[x, feat] + 1)/(len(self.words) + self.words_in_class[x]))
+                        for feat in features]))
