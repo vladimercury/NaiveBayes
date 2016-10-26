@@ -15,7 +15,7 @@ class MessageCollector:
         from util.classmap import ClassMap
         result = []
         classes = ClassMap()
-        for path in paths:
+        for path in sorted(paths.keys()):
             if log_paths:
                 print('Processing: ' + path)
             fold = []
