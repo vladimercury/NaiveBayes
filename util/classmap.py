@@ -1,6 +1,6 @@
 class ClassMap:
     def __init__(self):
-        self.data = dict()
+        self.data = {"spmsg": 0, "legit": 1}
         self.counter = 0
 
     def get_class(self, class_name):

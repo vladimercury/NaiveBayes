@@ -1,6 +1,9 @@
+from collections import defaultdict
+from math import log, exp
+
+
 class NaiveBayesClassifier:
     def __init__(self):
-        from collections import defaultdict
         self.frequency_table = defaultdict(lambda: 0)
         self.messages_in_class = defaultdict(lambda: 0)
         self.messages_total = 0
@@ -8,7 +11,9 @@ class NaiveBayesClassifier:
         self.words = defaultdict(lambda: 0)
 
     def train(self, samples):
-        for features, label in samples:
+        for msg in range(len(samples)):
+            features = samples[msg][0]
+            label = samples[msg][1]
             self.messages_in_class[label] += 1
             self.messages_total += 1
             for feature in features:
@@ -16,9 +21,12 @@ class NaiveBayesClassifier:
                 self.words_in_class[label] += 1
                 self.words[feature] += 1
 
-    def classify(self, features):
-        from math import log
-        return max(self.messages_in_class.keys(),
-                   key=lambda x: log(self.messages_in_class[x] / self.messages_total)
+    def classify(self, features, delim=0.5):
+        from math import exp
+        keys = {x: log(self.messages_in_class[x] / self.messages_total)
                         + sum([log((self.frequency_table[x, feat] + 1)/(len(self.words) + self.words_in_class[x]))
-                        for feat in features]))
+                        for feat in features]) for x in self.messages_in_class.keys()}
+        degree = keys[1] - keys[0]
+        pos = 0 if degree > 700 else 1 if degree < -700 else 1 / (1 + exp(degree))
+        return 0 if pos > delim else 1
+
