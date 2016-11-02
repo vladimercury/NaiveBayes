@@ -1,5 +1,5 @@
 from collections import defaultdict
-from math import log, exp
+from math import log, exp, log10
 
 
 class NaiveBayesClassifier:
@@ -22,11 +22,11 @@ class NaiveBayesClassifier:
                 self.words[feature] += 1
 
     def classify(self, features, delim=0.5):
-        from math import exp
         keys = {x: log(self.messages_in_class[x] / self.messages_total)
                         + sum([log((self.frequency_table[x, feat] + 1)/(len(self.words) + self.words_in_class[x]))
                         for feat in features]) for x in self.messages_in_class.keys()}
         degree = keys[1] - keys[0]
+        degree = -log(-degree) if degree < 0 else log(degree) if degree > 0 else 0
         pos = 0 if degree > 700 else 1 if degree < -700 else 1 / (1 + exp(degree))
         return 0 if pos > delim else 1
 

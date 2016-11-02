@@ -4,7 +4,7 @@ class StatsCounter:
         if len(samples) != len(results):
             raise RuntimeError('Samples size not equal to results size')
         if len(samples) == 0:
-            return [], 0
+            return {}, 0
         stat = [0] * len(samples)
         for fold in range(len(samples)):
             acc_sum = 0
@@ -18,7 +18,7 @@ class StatsCounter:
         if len(samples) != len(results):
             raise RuntimeError('Samples size not equal to results size')
         if len(samples) == 0:
-            return [], 0
+            return {}, 0
         f1_stat = [0] * len(samples)
         recall_stat = [0] * len(samples)
         precision_stat = [0] * len(samples)
@@ -43,3 +43,41 @@ class StatsCounter:
                     'recall': sum(recall_stat)/len(recall_stat),
                     'precision': sum(precision_stat)/len(precision_stat)
                 }}
+
+    @staticmethod
+    def confusion_matrix(samples, results):
+        if len(samples) != len(results):
+            raise RuntimeError('Samples size not equal to results size')
+        if len(samples) == 0:
+            return {}, 0
+        fold_confusions = []
+        fss, fsl, fls, fll = 0, 0, 0, 0
+        for fold in range(len(samples)):
+            ss, sl, ls, ll = 0, 0, 0, 0
+            for i in range(len(samples[fold])):
+                sample_0 = samples[fold][i][1] == 0
+                result_0 = results[fold][i] == 0
+                ss += sample_0 and result_0
+                sl += sample_0 and not result_0
+                ls += not sample_0 and result_0
+                ll += not sample_0 and not result_0
+            fss += ss
+            fsl += sl
+            fls += ls
+            fll += ll
+            fold_confusions.append({
+                'ss': ss,
+                'sl': sl,
+                'ls': ls,
+                'll': ll,
+            })
+        summary = {
+            'ss': fss / len(samples),
+            'sl': fsl / len(samples),
+            'ls': fls / len(samples),
+            'll': fll / len(samples),
+        }
+        return {
+            'folds': fold_confusions,
+            'summary': summary,
+        }
