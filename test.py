@@ -1,1 +1,1 @@
-print(type([]) is list)
+print(41289 // 2)
